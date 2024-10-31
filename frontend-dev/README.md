@@ -1,15 +1,18 @@
-# `create-preact`
-
-<h2 align="center">
-  <img height="256" width="256" src="./src/assets/preact.svg">
-</h2>
-
-<h3 align="center">Get started using Preact and Vite!</h3>
-
 ## Getting Started
 
--   `npm run dev` - Starts a dev server at http://localhost:5173/
+Only 3 deps installed
 
--   `npm run build` - Builds for production, emitting to `dist/`
+- Preact (light version of react)
+- Material Design lite for it https://github.com/developit/preact-mdl/blob/master/docs.md
+- react-canvas-gauges just a react version of the canvas gauges
 
--   `npm run preview` - Starts a server at http://localhost:4173/ to test production build locally
+You need node installed. I have node v20.17.0 for development.
+cd into this folder, and run `npm install` to install dependencies.
+After building opening the index.html file in the browser will not work because of CORS issues. You need to run a server to serve the files. By running `npm run build` then `npm run preview` you can view the site at http://localhost:4173/
+This should work on the esp32 because it will be hosting it.
+
+- `npm run dev` - Starts a dev server at http://localhost:5173/
+
+- `npm run build` - Builds for production, emitting to `dist/`. Copy this folder to the data folder on Airbear.
+
+- `npm run preview` - Starts a server at http://localhost:4173/ to test production build locally
