@@ -2,8 +2,8 @@ import { render } from "preact";
 
 import "../css/style.css";
 import { useState } from "preact/hooks";
-import ReactRadialGauge from "./CanvasGauges/ReactRadialGuage";
-import { gaugeConfig_rpm, gaugeConfig_rpm2 } from "./gauges";
+
+import { Grid } from "react-flexbox-grid";
 
 export function App() {
   const [layoutObject, setLayoutObject] = useState({}); // The layout config json, can import a default one.
@@ -20,7 +20,6 @@ export function App() {
 
   return (
     <div>
-
     </div>
   );
 }

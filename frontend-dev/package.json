@@ -8,7 +8,8 @@
 	},
 	"dependencies": {
 		"canvas-gauges": "^2.1.7",
-		"preact": "^10.22.1"
+		"preact": "^10.22.1",
+		"reactstrap": "^9.2.3"
 	},
 	"devDependencies": {
 		"@preact/preset-vite": "^2.9.0",
