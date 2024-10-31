@@ -5,6 +5,7 @@ Only 3 deps installed
 - Preact (light version of react)
 - Reactstrap
 - react-canvas-gauges just a react version of the canvas gauges
+- Some individual lodash modules for easy use. (can be converted later down the track)
 
 You need node installed. I have node v20.17.0 for development.
 cd into this folder, and run `npm install` to install dependencies.
