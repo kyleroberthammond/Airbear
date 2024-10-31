@@ -1,5 +1,4 @@
 export const gaugeConfig_rpm = {
-    type: "radial-gauge",
     width: 400,
     height: 400,
     units: "RPM",

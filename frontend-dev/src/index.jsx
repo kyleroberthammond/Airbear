@@ -1,16 +1,31 @@
-import { render } from "preact";
+import { Fragment, render } from "preact";
 
 // import "../css/style.css";
 import { useState } from "preact/hooks";
-import { Button, Col, Container, Modal, Row } from "reactstrap";
+import {
+  Button,
+  Col,
+  Container,
+  FormGroup,
+  Label,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  Row,
+} from "reactstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import map from "lodash.map";
 import clone from "lodash.clone";
+import ReactRadialGauge from "./CanvasGauges/ReactRadialGuage";
+import GaugeModalForm from "./GaugeModalForm";
 
 export function App() {
   const [layoutObject, setLayoutObject] = useState({ rows: [] }); // The layout config json, can import a default one.
   const [gaugeModalOpen, setGaugeModalOpen] = useState(false);
-  console.log(gaugeModalOpen);
+
+  const toggleGaugeModal = () => {
+    setGaugeModalOpen(!gaugeModalOpen);
+  };
 
   // Rows > Guages
   // Example object
@@ -40,6 +55,14 @@ export function App() {
     setLayoutObject(newLayoutObject);
   };
 
+  const addGaugeToLayout = (gaugeValues) => {
+    let newLayoutObject = clone(layoutObject);
+    newLayoutObject.rows[0].gauges.push(gaugeValues); // Add the gauge to the first row
+
+    // // Update the layout object with the new rows.
+    setLayoutObject(newLayoutObject);
+  };
+
   return (
     <Container fluid>
       {map(rows, (row, index) => {
@@ -48,38 +71,54 @@ export function App() {
             row={row}
             key={index}
             index={index}
-            toggleGaugeModal={() => {
-              setGaugeModalOpen(!gaugeModalOpen);
-            }}
+            toggleGaugeModal={toggleGaugeModal}
           />
         );
       })}
 
       <Row className="mt-2">
         <Col>
-          <Button onClick={addRow}>Add Row</Button>
+          <Button onClick={addRow}>Add Row of gauges</Button>
         </Col>
       </Row>
 
-      <GaugeModal isOpen={gaugeModalOpen} />
+      <GaugeModalForm
+        isOpen={gaugeModalOpen}
+        toggleGaugeModal={toggleGaugeModal}
+        addGaugeToLayout={addGaugeToLayout}
+      />
     </Container>
   );
 }
 
 const RowOfGauges = (props) => {
   const { row, index, toggleGaugeModal } = props;
+  const { gauges } = row;
+
   return (
-    <Row className="mt-2">
-      <Col>
-        <Button onClick={toggleGaugeModal}>Add Gauge</Button>
-      </Col>
-    </Row>
+    <Fragment>
+      <Row>
+        {map(gauges, (gauge, index) => {
+          return (
+            <Col key={index} md={gauge?.containerWidth}>
+              <RenderGauge gaugeValues={gauge} />
+            </Col>
+          );
+        })}
+        <Col>
+          <Button onClick={toggleGaugeModal}>Add Gauge</Button>
+        </Col>
+      </Row>
+    </Fragment>
   );
 };
 
-const GaugeModal = (props) => {
-  const { isOpen } = props;
-  return <Modal isOpen={isOpen} trigger="legacy">Add new gauge here</Modal>;
+export const RenderGauge = (props) => {
+  const { gaugeValues } = props;
+
+  if (gaugeValues?.type == "radial") {
+    return <ReactRadialGauge {...gaugeValues} />;
+  }
 };
 
 render(<App />, document.getElementById("app"));
