@@ -3,7 +3,7 @@
 Only 3 deps installed
 
 - Preact (light version of react)
-- Material Design lite for it https://github.com/developit/preact-mdl/blob/master/docs.md
+- Reactstrap
 - react-canvas-gauges just a react version of the canvas gauges
 
 You need node installed. I have node v20.17.0 for development.
