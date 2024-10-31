@@ -7,9 +7,13 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"bootstrap": "^5.3.3",
 		"canvas-gauges": "^2.1.7",
+		"lodash.clone": "^4.5.0",
+		"lodash.clonedeep": "^4.5.0",
+		"lodash.map": "^4.6.0",
 		"preact": "^10.22.1",
-		"reactstrap": "^9.2.3"
+		"reactstrap": "^8.10.1"
 	},
 	"devDependencies": {
 		"@preact/preset-vite": "^2.9.0",
