@@ -1,23 +1,16 @@
 import { Fragment, render } from "preact";
 
-// import "../css/style.css";
 import { useState } from "preact/hooks";
-import {
-  Button,
-  Col,
-  Container,
-  FormGroup,
-  Label,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  Row,
-} from "reactstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { Button, Col, Container, Row } from "reactstrap";
 import map from "lodash.map";
 import clone from "lodash.clone";
+import sumBy from "lodash.sumby";
 import ReactRadialGauge from "./CanvasGauges/ReactRadialGuage";
 import GaugeModalForm from "./GaugeModalForm";
+import RightSidebar from "./RightSidebar";
+
+import "../css/style.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 export function App() {
   const [layoutObject, setLayoutObject] = useState({ rows: [] }); // The layout config json, can import a default one.
@@ -65,20 +58,26 @@ export function App() {
 
   return (
     <Container fluid>
-      {map(rows, (row, index) => {
-        return (
-          <RowOfGauges
-            row={row}
-            key={index}
-            index={index}
-            toggleGaugeModal={toggleGaugeModal}
-          />
-        );
-      })}
-
-      <Row className="mt-2">
-        <Col>
-          <Button onClick={addRow}>Add Row of gauges</Button>
+      <Row>
+        <Col md={11}>
+          {map(rows, (row, index) => {
+            return (
+              <RowOfGauges
+                row={row}
+                key={index}
+                index={index}
+                toggleGaugeModal={toggleGaugeModal}
+              />
+            );
+          })}
+          <Row className="mt-2">
+            <Col>
+              <Button onClick={addRow}>Add Row</Button>
+            </Col>
+          </Row>
+        </Col>
+        <Col md={1} className="text-end mt-2">
+          <RightSidebar />
         </Col>
       </Row>
 
@@ -95,21 +94,24 @@ const RowOfGauges = (props) => {
   const { row, index, toggleGaugeModal } = props;
   const { gauges } = row;
 
+  const totalUsedWidth = sumBy(gauges, (g) => parseInt(g.containerWidth));
+
+  console.log(totalUsedWidth);
   return (
-    <Fragment>
-      <Row>
-        {map(gauges, (gauge, index) => {
-          return (
-            <Col key={index} md={gauge?.containerWidth}>
-              <RenderGauge gaugeValues={gauge} />
-            </Col>
-          );
-        })}
+    <Row className="mt-2">
+      {map(gauges, (gauge, index) => {
+        return (
+          <Col key={index} md={gauge?.containerWidth}>
+            <RenderGauge gaugeValues={gauge} />
+          </Col>
+        );
+      })}
+      {totalUsedWidth < 12 && (
         <Col>
           <Button onClick={toggleGaugeModal}>Add Gauge</Button>
         </Col>
-      </Row>
-    </Fragment>
+      )}
+    </Row>
   );
 };
 
