@@ -6,6 +6,7 @@ import MinimizeButton from "./Icons/MinimizeButton";
 import MaximizeButton from "./Icons/MaximizeButton";
 
 export const RightSidebar = (props) => {
+  const { toggleEditing } = props;
   const [fullscreen, setFullscreen] = useState(false);
   const toggleFullscreen = () => {
     setFullscreen(!fullscreen);
@@ -21,12 +22,7 @@ export const RightSidebar = (props) => {
       <Button onClick={toggleFullscreen}>
         {fullscreen ? <MinimizeButton /> : <MaximizeButton />}
       </Button>
-      <Button
-        className="mt-2"
-        onClick={() => {
-          alert("hi");
-        }}
-      >
+      <Button className="mt-2" onClick={toggleEditing}>
         <PencilIcon />
       </Button>
       <Button

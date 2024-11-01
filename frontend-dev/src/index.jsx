@@ -1,6 +1,6 @@
 import { Fragment, render } from "preact";
 
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { Button, Col, Container, Row } from "reactstrap";
 import map from "lodash.map";
 import clone from "lodash.clone";
@@ -11,14 +11,23 @@ import RightSidebar from "./RightSidebar";
 
 import "../css/style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import isEmpty from "lodash.isempty";
 
 export function App() {
+  const toggleEditing = () => setEditing(!editing);
   const [layoutObject, setLayoutObject] = useState({ rows: [] }); // The layout config json, can import a default one.
   const [gaugeModalOpen, setGaugeModalOpen] = useState(false);
 
+  const [editing, setEditing] = useState(false);
+  const [gaugeEditing, setGaugeEditing] = useState(null);
   const toggleGaugeModal = () => {
     setGaugeModalOpen(!gaugeModalOpen);
   };
+  useEffect(() => {
+    if (!isEmpty(gaugeEditing)) {
+      toggleGaugeModal();
+    }
+  }, [gaugeEditing]);
 
   // Rows > Guages
   // Example object
@@ -56,57 +65,77 @@ export function App() {
     setLayoutObject(newLayoutObject);
   };
 
+  const updateGaugeInLayout = (gaugeValues) => {
+    let newLayoutObject = clone(layoutObject);
+    newLayoutObject.rows[gaugeValues.rowIndex].gauges[gaugeValues.gaugeIndex] = gaugeValues; // Add the gauge to the first row
+
+    // // Update the layout object with the new rows.
+    setLayoutObject(newLayoutObject);
+  };
+
   return (
     <Container fluid>
       <Row>
         <Col md={11}>
-          {map(rows, (row, index) => {
+          {map(rows, (row, rowIndex) => {
             return (
               <RowOfGauges
                 row={row}
-                key={index}
-                index={index}
+                key={rowIndex}
+                rowIndex={rowIndex}
                 toggleGaugeModal={toggleGaugeModal}
+                setGaugeEditing={setGaugeEditing}
+                editing={editing}
               />
             );
           })}
-          <Row className="mt-2">
-            <Col>
-              <Button onClick={addRow}>Add Row</Button>
-            </Col>
-          </Row>
+          {editing && (
+            <Row className="mt-2">
+              <Col>
+                <Button onClick={addRow}>Add Row</Button>
+              </Col>
+            </Row>
+          )}
         </Col>
         <Col md={1} className="text-end mt-2">
-          <RightSidebar />
+          <RightSidebar toggleEditing={toggleEditing} />
         </Col>
       </Row>
 
-      <GaugeModalForm
-        isOpen={gaugeModalOpen}
-        toggleGaugeModal={toggleGaugeModal}
-        addGaugeToLayout={addGaugeToLayout}
-      />
+      {gaugeModalOpen && (
+        <GaugeModalForm
+          isOpen={gaugeModalOpen}
+          toggleGaugeModal={toggleGaugeModal}
+          addGaugeToLayout={addGaugeToLayout}
+          updateGaugeInLayout={updateGaugeInLayout}
+          gaugeEditing={gaugeEditing}
+        />
+      )}
     </Container>
   );
 }
 
 const RowOfGauges = (props) => {
-  const { row, index, toggleGaugeModal } = props;
+  const { row, rowIndex, toggleGaugeModal, editing, setGaugeEditing } = props;
   const { gauges } = row;
 
   const totalUsedWidth = sumBy(gauges, (g) => parseInt(g.containerWidth));
-
-  console.log(totalUsedWidth);
   return (
     <Row className="mt-2">
-      {map(gauges, (gauge, index) => {
+      {map(gauges, (gauge, gaugeIndex) => {
         return (
-          <Col key={index} md={gauge?.containerWidth}>
-            <RenderGauge gaugeValues={gauge} />
+          <Col key={gaugeIndex} md={gauge?.containerWidth}>
+            <RenderGauge
+              editing={editing}
+              gaugeValues={gauge}
+              onGaugeClick={() => {
+                setGaugeEditing({ ...gauge, rowIndex, gaugeIndex });
+              }}
+            />
           </Col>
         );
       })}
-      {totalUsedWidth < 12 && (
+      {totalUsedWidth < 12 && editing && (
         <Col>
           <Button onClick={toggleGaugeModal}>Add Gauge</Button>
         </Col>
@@ -116,11 +145,23 @@ const RowOfGauges = (props) => {
 };
 
 export const RenderGauge = (props) => {
-  const { gaugeValues } = props;
+  const { gaugeValues, editing, onGaugeClick } = props;
 
-  if (gaugeValues?.type == "radial") {
-    return <ReactRadialGauge {...gaugeValues} />;
-  }
+  return (
+    <div>
+      {gaugeValues?.type == "radial" && (
+        <ReactRadialGauge
+          style={{ cursor: editing ? "pointer" : "" }}
+          onClick={() => {
+            if (editing) {
+              onGaugeClick();
+            }
+          }}
+          {...gaugeValues}
+        />
+      )}
+    </div>
+  );
 };
 
 render(<App />, document.getElementById("app"));

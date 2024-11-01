@@ -21,6 +21,7 @@ class ReactRadialGauge extends React.Component {
         ref={(canvas) => {
           this.el = canvas;
         }}
+        {...this.props}
       />
     );
   }

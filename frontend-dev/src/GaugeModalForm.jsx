@@ -13,13 +13,23 @@ import { RenderGauge } from "./index";
 import { useState } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
 import { gaugeConfig_rpm } from "./gauges";
+import isEmpty from "lodash.isempty";
 
 export const GaugeModalForm = (props) => {
-  const { isOpen, toggleGaugeModal, addGaugeToLayout } = props;
-  const [formState, setFormState] = useState({
-    ...gaugeConfig_rpm,
-    containerWidth: 6,
-  }); // Set up a form state to handle two way binding
+  const {
+    isOpen,
+    toggleGaugeModal,
+    addGaugeToLayout,
+    updateGaugeInLayout,
+    gaugeEditing,
+  } = props;
+  const defaultFormState = { ...gaugeConfig_rpm, containerWidth: 6 };
+
+  const isEditingAGauge = !isEmpty(gaugeEditing);
+
+  const [formState, setFormState] = useState(
+    isEditingAGauge ? gaugeEditing : defaultFormState
+  ); // Set up a form state to handle two way binding
 
   const handleFormChange = (e) => {
     setFormState((prevFormState) => {
@@ -53,7 +63,7 @@ export const GaugeModalForm = (props) => {
         <FormGroup row>
           <Col md={4}>Container Width (1 to 12)</Col>
           <Col md={4}>
-            <input
+            <Input
               type="number"
               max="12"
               min="1"
@@ -63,6 +73,18 @@ export const GaugeModalForm = (props) => {
             />
           </Col>
         </FormGroup>
+        <Row row>
+          <Col md={4}>Data Channel</Col>
+          <Col md={4}>
+            <Input
+              name="channel"
+              id="channel"
+              onChange={handleFormChange}
+              value={formState.channel}
+              type="string"
+            />
+          </Col>
+        </Row>
 
         {formState.type && (
           <Fragment>
@@ -87,12 +109,15 @@ export const GaugeModalForm = (props) => {
             className="mt-5"
             color="success"
             onClick={() => {
-              addGaugeToLayout(formState);
-              setFormState({ ...gaugeConfig_rpm, containerWidth: 6 });
+              if (isEditingAGauge) {
+                updateGaugeInLayout(formState);
+              } else {
+                addGaugeToLayout(formState);
+              }
               toggleGaugeModal();
             }}
           >
-            Add Gauge
+            {isEditingAGauge ? "Update" : "Add"} Gauge
           </Button>
         )}
       </ModalBody>
