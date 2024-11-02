@@ -12,6 +12,7 @@ import RightSidebar from "./RightSidebar";
 import "../css/style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import isEmpty from "lodash.isempty";
+import GaugeTypes from "./GaugeTypes";
 
 export function App() {
   const toggleEditing = () => setEditing(!editing);
@@ -29,11 +30,11 @@ export function App() {
     }
   }, [gaugeEditing]);
 
-  // Rows > Guages
+  // Rows > Gauges
   // Example object
   // {rows:[
-  //   {guages:[]},
-  //   {guages:[]},
+  //   {Gauges:[]},
+  //   {Gauges:[]},
   // ]}
 
   // const [data, setData] = useState({});
@@ -59,7 +60,7 @@ export function App() {
 
   const addGaugeToLayout = (gaugeValues) => {
     let newLayoutObject = clone(layoutObject);
-    newLayoutObject.rows[0].gauges.push(gaugeValues); // Add the gauge to the first row
+    newLayoutObject.rows[0].gauges.push({ saved: true, ...gaugeValues }); // Add the gauge to the first row for now
 
     // // Update the layout object with the new rows.
     setLayoutObject(newLayoutObject);
@@ -120,6 +121,7 @@ export function App() {
           toggleGaugeModal={toggleGaugeModal}
           addGaugeToLayout={addGaugeToLayout}
           updateGaugeInLayout={updateGaugeInLayout}
+          removeGaugeFromLayout={removeGaugeFromLayout}
           gaugeEditing={gaugeEditing}
         />
       )}
@@ -135,19 +137,20 @@ const RowOfGauges = (props) => {
   return (
     <Row className="mt-2">
       {map(gauges, (gauge, gaugeIndex) => {
-        console.log(gauge);
-        return (
-          <Col key={gaugeIndex} md={gauge?.containerWidth}>
-            {/* <RenderGauge
-              editing={editing}
-              gaugeValues={gauge}
-              onGaugeClick={() => {
-                setGaugeEditing({ ...gauge, rowIndex, gaugeIndex });
-              }}
-            /> */}
-            Find and render here
-          </Col>
-        );
+        const findGaugeType = GaugeTypes.find((gt) => gt.value === gauge?.type);
+        if (findGaugeType) {
+          return (
+            <Col key={gaugeIndex} md={gauge?.containerWidth}>
+              <findGaugeType.renderGauge
+                editing={editing}
+                gaugeValues={gauge}
+                onGaugeClick={() => {
+                  setGaugeEditing({ ...gauge, rowIndex, gaugeIndex });
+                }}
+              />
+            </Col>
+          );
+        }
       })}
       {totalUsedWidth < 12 && editing && (
         <Col>

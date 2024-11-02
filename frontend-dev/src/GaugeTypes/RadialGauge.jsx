@@ -171,7 +171,7 @@ const RadialGaugeForm = (props) => {
   );
 };
 
-const RadialGaugeRender = ({ editing, gaugeValues }) => {
+const RadialGaugeRender = ({ editing, gaugeValues, onGaugeClick }) => {
   return (
     <ReactRadialGauge
       style={{ cursor: editing ? "pointer" : "" }}

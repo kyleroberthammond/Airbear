@@ -22,11 +22,12 @@ export const GaugeModalForm = (props) => {
     toggleGaugeModal,
     addGaugeToLayout,
     updateGaugeInLayout,
+    removeGaugeFromLayout,
     gaugeEditing,
   } = props;
   const defaultFormState = { containerWidth: 6 };
 
-  const isEditingAGauge = !isEmpty(gaugeEditing);
+  const isEditingAGauge = gaugeEditing?.saved;
 
   const [formState, setFormState] = useState(
     isEditingAGauge ? gaugeEditing : defaultFormState
@@ -122,20 +123,38 @@ export const GaugeModalForm = (props) => {
         )}
 
         {formState && (
-          <Button
-            className="mt-5"
-            color="success"
-            onClick={() => {
-              if (isEditingAGauge) {
-                updateGaugeInLayout(formState);
-              } else {
-                addGaugeToLayout(formState);
-              }
-              toggleGaugeModal();
-            }}
-          >
-            {isEditingAGauge ? "Update" : "Add"} Gauge
-          </Button>
+          <Row>
+            <Col md={10}>
+              <Button
+                className="mt-5"
+                color="success"
+                onClick={() => {
+                  if (isEditingAGauge) {
+                    updateGaugeInLayout(formState);
+                  } else {
+                    addGaugeToLayout(formState);
+                  }
+                  toggleGaugeModal();
+                }}
+              >
+                {isEditingAGauge ? "Update" : "Add"} Gauge
+              </Button>
+            </Col>
+            <Col md={2}>
+              {isEditingAGauge && (
+                <Button
+                  className="mt-5 ml-2"
+                  color="danger"
+                  onClick={() => {
+                    removeGaugeFromLayout(formState);
+                    toggleGaugeModal();
+                  }}
+                >
+                  Remove
+                </Button>
+              )}
+            </Col>
+          </Row>
         )}
       </ModalBody>
     </Modal>
