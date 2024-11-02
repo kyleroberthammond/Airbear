@@ -1,3 +1,5 @@
+// This is just to implement the Linear Gauge from vanilla js to react
+
 import React from "react";
 
 import { LinearGauge } from "canvas-gauges";
