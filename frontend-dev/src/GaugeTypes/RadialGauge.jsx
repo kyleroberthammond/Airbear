@@ -13,7 +13,7 @@ import {
 } from "reactstrap";
 import ReactRadialGauge from "../helpers/ReactRadialGuage";
 import { useState } from "preact/hooks";
-import { HexColorPicker } from "react-colorful";
+import PopoverPicker from "../helpers/PopoverColorPicker";
 
 const RadialGaugeForm = (props) => {
   const { formState, handleFormChange } = props;
@@ -221,7 +221,7 @@ const StylesTab = (props) => {
           <Label for="colorPlate">Color Plate</Label>
         </Col>
         <Col md={9}>
-          <HexColorPicker
+          <PopoverPicker
             color={formState["colorPlate"]}
             onChange={(value) => {
               handleFormChange({ target: { name: "colorPlate", value } }); // Fake it as an event
