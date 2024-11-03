@@ -10,7 +10,6 @@ import {
 } from "reactstrap";
 import { useEffect, useState } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
-import isEmpty from "lodash.isempty";
 
 import GaugeTypes from "./GaugeTypes";
 import map from "lodash.map";
@@ -101,6 +100,19 @@ export const GaugeModalForm = (props) => {
               onChange={handleFormChange}
               name="containerWidth"
               value={formState["containerWidth"]}
+            />
+          </Col>
+        </FormGroup>
+        <FormGroup row>
+          <Col md={4}>Offset from the left (1 to 12)</Col>
+          <Col md={4}>
+            <Input
+              type="number"
+              max="12"
+              min="1"
+              onChange={handleFormChange}
+              name="offsetWidth"
+              value={formState["offsetWidth"]}
             />
           </Col>
         </FormGroup>

@@ -58,6 +58,7 @@ export function App() {
   };
 
   const addGaugeToLayout = (gaugeValues) => {
+    console.log(gaugeValues);
     let newLayoutObject = clone(layoutObject);
     newLayoutObject.rows[0].gauges.push({ saved: true, ...gaugeValues }); // Add the gauge to the first row for now
 
@@ -84,8 +85,6 @@ export function App() {
     // // Update the layout object with the new rows.
     setLayoutObject(newLayoutObject);
   };
-
-  console.log(gaugeEditing);
 
   return (
     <Container fluid>
@@ -134,14 +133,21 @@ const RowOfGauges = (props) => {
   const { row, rowIndex, toggleGaugeModal, editing, setGaugeEditing } = props;
   const { gauges } = row;
 
-  const totalUsedWidth = sumBy(gauges, (g) => parseInt(g.containerWidth));
+  const totalUsedWidth = sumBy(
+    gauges,
+    (g) => parseInt(g.containerWidth) + parseInt(g.offsetWidth)
+  );
+
   return (
     <Row className="mt-2">
       {map(gauges, (gauge, gaugeIndex) => {
         const findGaugeType = GaugeTypes.find((gt) => gt.value === gauge?.type);
         if (findGaugeType) {
           return (
-            <Col key={gaugeIndex} md={gauge?.containerWidth}>
+            <Col
+              key={gaugeIndex}
+              md={{ size: gauge?.containerWidth, offset: gauge?.offsetWidth }}
+            >
               <findGaugeType.renderGauge
                 editing={editing}
                 gaugeValues={gauge}

@@ -116,6 +116,18 @@ const ValuesTab = (props) => {
   return (
     <Fragment>
       <Row row>
+        <Col md={3}>Show Value Box</Col>
+        <Col md={9}>
+          <Input
+            name="valueBox"
+            id="valueBox"
+            onChange={handleFormChange}
+            checked={formState?.valueBox}
+            type="checkbox"
+          />
+        </Col>
+      </Row>
+      <Row row>
         <Col md={3}>Default Value</Col>
         <Col md={9}>
           <Input
