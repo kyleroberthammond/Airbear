@@ -24,7 +24,7 @@ export const GaugeModalForm = (props) => {
     removeGaugeFromLayout,
     gaugeEditing,
   } = props;
-  const defaultFormState = { containerWidth: 6 };
+  const defaultFormState = { containerWidth: 6, offsetWidth: 0 };
 
   const isEditingAGauge = gaugeEditing?.saved;
 

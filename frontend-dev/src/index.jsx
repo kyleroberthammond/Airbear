@@ -18,6 +18,7 @@ export function App() {
   const [layoutObject, setLayoutObject] = useState({ rows: [] }); // The layout config json, can import a default one.
   const [gaugeModalOpen, setGaugeModalOpen] = useState(false);
 
+  const [rowIndexAddingOn, setRowIndexAddingOn] = useState(null);
   const [editing, setEditing] = useState(true);
   const [gaugeEditing, setGaugeEditing] = useState(null);
   const toggleGaugeModal = () => {
@@ -58,9 +59,11 @@ export function App() {
   };
 
   const addGaugeToLayout = (gaugeValues) => {
-    console.log(gaugeValues);
     let newLayoutObject = clone(layoutObject);
-    newLayoutObject.rows[0].gauges.push({ saved: true, ...gaugeValues }); // Add the gauge to the first row for now
+    newLayoutObject.rows[rowIndexAddingOn].gauges.push({
+      saved: true,
+      ...gaugeValues,
+    }); // Add the gauge to the first row for now
 
     // // Update the layout object with the new rows.
     setLayoutObject(newLayoutObject);
@@ -99,6 +102,7 @@ export function App() {
                 toggleGaugeModal={toggleGaugeModal}
                 setGaugeEditing={setGaugeEditing}
                 editing={editing}
+                setRowIndexAddingOn={setRowIndexAddingOn}
               />
             );
           })}
@@ -130,7 +134,14 @@ export function App() {
 }
 
 const RowOfGauges = (props) => {
-  const { row, rowIndex, toggleGaugeModal, editing, setGaugeEditing } = props;
+  const {
+    row,
+    rowIndex,
+    toggleGaugeModal,
+    editing,
+    setGaugeEditing,
+    setRowIndexAddingOn,
+  } = props;
   const { gauges } = row;
 
   const totalUsedWidth = sumBy(
@@ -161,7 +172,15 @@ const RowOfGauges = (props) => {
       })}
       {totalUsedWidth < 12 && editing && (
         <Col>
-          <Button onClick={toggleGaugeModal}>Add Gauge</Button>
+          <Button
+            onClick={() => {
+              setGaugeEditing(null);
+              toggleGaugeModal();
+              setRowIndexAddingOn(rowIndex);
+            }}
+          >
+            Add Gauge
+          </Button>
         </Col>
       )}
     </Row>
