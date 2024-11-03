@@ -1,12 +1,11 @@
-import { Fragment, render } from "preact";
+import { render } from "preact";
 
 import { useEffect, useState } from "preact/hooks";
 import { Button, Col, Container, Row } from "reactstrap";
 import map from "lodash.map";
 import clone from "lodash.clone";
 import sumBy from "lodash.sumby";
-import ReactRadialGauge from "./helpers/ReactRadialGuage";
-import GaugeModalForm from "./index/AddGaugeModal";
+import GaugeModalForm from "./AddGaugeModal";
 import RightSidebar from "./RightSidebar";
 
 import "../css/style.css";
@@ -85,6 +84,8 @@ export function App() {
     // // Update the layout object with the new rows.
     setLayoutObject(newLayoutObject);
   };
+
+  console.log(gaugeEditing);
 
   return (
     <Container fluid>

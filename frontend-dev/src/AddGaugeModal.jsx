@@ -12,7 +12,7 @@ import { useEffect, useState } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
 import isEmpty from "lodash.isempty";
 
-import GaugeTypes from "../GaugeTypes";
+import GaugeTypes from "./GaugeTypes";
 import map from "lodash.map";
 import clone from "lodash.clone";
 
@@ -34,9 +34,16 @@ export const GaugeModalForm = (props) => {
   ); // Set up a form state to handle two way binding
 
   const handleFormChange = (e) => {
+    const formType = e.target.getAttribute("formType");
     setFormState((prevFormState) => {
       let newFormState = { ...prevFormState };
-      newFormState[e.target.name] = e.target.value;
+      if (e.target.type == "checkbox") {
+        newFormState[e.target.name] = e.target.checked;
+      } else if (formType == "arrayString") {
+        newFormState[e.target.name] = e.target.value.split(",");
+      } else {
+        newFormState[e.target.name] = e.target.value;
+      }
       return newFormState;
     });
   };
@@ -46,7 +53,8 @@ export const GaugeModalForm = (props) => {
   );
 
   useEffect(() => {
-    if (selectedGaugeType?.defaultValues) {
+    // If its a new gauge then set the default values
+    if (selectedGaugeType?.defaultValues && !isEditingAGauge) {
       let newFormState = clone(formState);
       newFormState = {
         ...newFormState,
@@ -63,10 +71,13 @@ export const GaugeModalForm = (props) => {
         <FormGroup row>
           <Col md={4}>Type</Col>
           <Col md={4}>
-            <select
+            <Input
+              type="select"
               name="type"
+              className="form-control"
               value={formState["type"]}
               onChange={handleFormChange}
+              style={{ appearance: "auto" }}
             >
               <option value="" disabled selected>
                 Select a gauge type
@@ -74,11 +85,11 @@ export const GaugeModalForm = (props) => {
               {map(GaugeTypes, (gauge) => (
                 <option value={gauge.value}>{gauge.label}</option>
               ))}
-            </select>
+            </Input>
           </Col>
         </FormGroup>
         <FormGroup row>
-          <Col md={4}>Container Width (1 to 12)</Col>
+          <Col md={4}>Width (1 to 12)</Col>
           <Col md={4}>
             <Input
               type="number"
@@ -97,7 +108,7 @@ export const GaugeModalForm = (props) => {
               name="channel"
               id="channel"
               onChange={handleFormChange}
-              value={formState.channel}
+              value={formState["channel"]}
               type="string"
             />
           </Col>
@@ -106,11 +117,14 @@ export const GaugeModalForm = (props) => {
         {formState.type && selectedGaugeType && (
           <Fragment>
             <hr />
-            <Row>
-              <Col md={7}>
+            <Row style={{ textAlign: "center" }}>
+              <Col>
                 <selectedGaugeType.renderGauge gaugeValues={formState} />
               </Col>
-              <Col md={5}>
+            </Row>
+            <hr />
+            <Row>
+              <Col>
                 <selectedGaugeType.renderForm
                   editing={false}
                   formState={formState}
@@ -118,43 +132,44 @@ export const GaugeModalForm = (props) => {
                 />
               </Col>
             </Row>
-            <hr />
           </Fragment>
         )}
 
         {formState && (
-          <Row>
-            <Col md={10}>
-              <Button
-                className="mt-5"
-                color="success"
-                onClick={() => {
-                  if (isEditingAGauge) {
-                    updateGaugeInLayout(formState);
-                  } else {
-                    addGaugeToLayout(formState);
-                  }
-                  toggleGaugeModal();
-                }}
-              >
-                {isEditingAGauge ? "Update" : "Add"} Gauge
-              </Button>
-            </Col>
-            <Col md={2}>
-              {isEditingAGauge && (
+          <Fragment>
+            <hr />
+            <Row>
+              <Col md={10}>
                 <Button
-                  className="mt-5 ml-2"
-                  color="danger"
+                  color="success"
                   onClick={() => {
-                    removeGaugeFromLayout(formState);
+                    if (isEditingAGauge) {
+                      updateGaugeInLayout(formState);
+                    } else {
+                      addGaugeToLayout(formState);
+                    }
                     toggleGaugeModal();
                   }}
                 >
-                  Remove
+                  {isEditingAGauge ? "Update" : "Add"} Gauge
                 </Button>
-              )}
-            </Col>
-          </Row>
+              </Col>
+              <Col md={2}>
+                {isEditingAGauge && (
+                  <Button
+                    className="ml-2"
+                    color="danger"
+                    onClick={() => {
+                      removeGaugeFromLayout(formState);
+                      toggleGaugeModal();
+                    }}
+                  >
+                    Remove
+                  </Button>
+                )}
+              </Col>
+            </Row>
+          </Fragment>
         )}
       </ModalBody>
     </Modal>

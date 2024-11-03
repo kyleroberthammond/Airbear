@@ -1,43 +1,86 @@
 import { Fragment } from "preact/jsx-runtime";
-import { Col, FormGroup, Input, Label, Row } from "reactstrap";
+import {
+  Col,
+  FormGroup,
+  Input,
+  Label,
+  Nav,
+  NavItem,
+  NavLink,
+  Row,
+  TabContent,
+  TabPane,
+} from "reactstrap";
 import ReactRadialGauge from "../helpers/ReactRadialGuage";
+import { useState } from "preact/hooks";
 
 const RadialGaugeForm = (props) => {
   const { formState, handleFormChange } = props;
+  const [activeTab, setActiveTab] = useState("text");
+
+  const toggle = (tab) => {
+    if (activeTab !== tab) setActiveTab(tab);
+  };
 
   return (
     <Fragment>
+      <Nav tabs>
+        <NavItem>
+          <NavLink
+            className={activeTab == "text" ? "active" : ""}
+            onClick={() => {
+              toggle("text");
+            }}
+          >
+            Text
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink
+            className={activeTab == "values" ? "active" : ""}
+            onClick={() => {
+              toggle("values");
+            }}
+          >
+            Values
+          </NavLink>
+        </NavItem>
+      </Nav>
+      <TabContent activeTab={activeTab}>
+        <TabPane tabId="text" className="p-3">
+          <TextTab formState={formState} handleFormChange={handleFormChange} />
+        </TabPane>
+        <TabPane tabId="values" className="p-3">
+          <ValuesTab
+            formState={formState}
+            handleFormChange={handleFormChange}
+          />
+        </TabPane>
+      </TabContent>
+    </Fragment>
+  );
+};
+
+const TextTab = (props) => {
+  const { formState, handleFormChange } = props;
+  return (
+    <Fragment>
       <Row row>
-        <Col md={5}>Width (px)</Col>
-        <Col md={7}>
+        <Col md={3}>Title</Col>
+        <Col md={9}>
           <Input
-            name="width"
-            id="width"
+            name="title"
+            id="title"
             onChange={handleFormChange}
-            value={formState?.width}
-            type="number"
+            value={formState?.title || ""}
           />
         </Col>
       </Row>
-
-      <Row>
-        <Col md={5}>Height (px)</Col>
-        <Col md={7}>
-          <Input
-            name="height"
-            id="height"
-            onChange={handleFormChange}
-            value={formState?.height}
-            type="number"
-          />
-        </Col>
-      </Row>
-
       <FormGroup row>
-        <Col md={5}>
+        <Col md={3}>
           <Label for="units">Units</Label>
         </Col>
-        <Col md={7}>
+        <Col md={9}>
           <Input
             name="units"
             id="units"
@@ -47,12 +90,17 @@ const RadialGaugeForm = (props) => {
           />
         </Col>
       </FormGroup>
+    </Fragment>
+  );
+};
 
-      <FormGroup row>
-        <Col md={5}>
-          <Label for="value">Value</Label>
-        </Col>
-        <Col md={7}>
+const ValuesTab = (props) => {
+  const { formState, handleFormChange } = props;
+  return (
+    <Fragment>
+      <Row row>
+        <Col md={3}>Default Value</Col>
+        <Col md={9}>
           <Input
             name="value"
             id="value"
@@ -61,13 +109,10 @@ const RadialGaugeForm = (props) => {
             type="number"
           />
         </Col>
-      </FormGroup>
-
-      <FormGroup row>
-        <Col md={5}>
-          <Label for="minValue">Min Value</Label>
-        </Col>
-        <Col md={7}>
+      </Row>
+      <Row row>
+        <Col md={3}>Min Value</Col>
+        <Col md={9}>
           <Input
             name="minValue"
             id="minValue"
@@ -76,13 +121,10 @@ const RadialGaugeForm = (props) => {
             type="number"
           />
         </Col>
-      </FormGroup>
-
-      <FormGroup row>
-        <Col md={5}>
-          <Label for="maxValue">Max Value</Label>
-        </Col>
-        <Col md={7}>
+      </Row>
+      <Row row>
+        <Col md={3}>Max Value</Col>
+        <Col md={9}>
           <Input
             name="maxValue"
             id="maxValue"
@@ -91,28 +133,26 @@ const RadialGaugeForm = (props) => {
             type="number"
           />
         </Col>
-      </FormGroup>
-
+      </Row>
       <FormGroup row>
-        <Col md={5}>
+        <Col md={3}>
           <Label for="majorTicks">Major Ticks</Label>
         </Col>
-        <Col md={7}>
+        <Col md={9}>
           <Input
             name="majorTicks"
             id="majorTicks"
             onChange={handleFormChange}
             value={formState?.majorTicks}
-            type="text"
+            formType="arrayString"
           />
         </Col>
       </FormGroup>
-
       <FormGroup row>
-        <Col md={5}>
+        <Col md={3}>
           <Label for="minorTicks">Minor Ticks</Label>
         </Col>
-        <Col md={7}>
+        <Col md={9}>
           <Input
             name="minorTicks"
             id="minorTicks"
@@ -124,46 +164,16 @@ const RadialGaugeForm = (props) => {
       </FormGroup>
 
       <FormGroup row>
-        <Col md={5}>
+        <Col md={3}>
           <Label for="strokeTicks">Stroke Ticks</Label>
         </Col>
-        <Col md={7}>
+        <Col md={9}>
           <Input
             name="strokeTicks"
             id="strokeTicks"
             onChange={handleFormChange}
             checked={formState?.strokeTicks}
             type="checkbox"
-          />
-        </Col>
-      </FormGroup>
-
-      <FormGroup row>
-        <Col md={5}>
-          <Label for="colorPlate">Color Plate</Label>
-        </Col>
-        <Col md={7}>
-          <Input
-            name="colorPlate"
-            id="colorPlate"
-            onChange={handleFormChange}
-            value={formState?.colorPlate}
-            type="text"
-          />
-        </Col>
-      </FormGroup>
-
-      <FormGroup row>
-        <Col md={5}>
-          <Label for="fontValue">Font Value</Label>
-        </Col>
-        <Col md={7}>
-          <Input
-            name="fontValue"
-            id="fontValue"
-            onChange={handleFormChange}
-            value={formState?.fontValue}
-            type="text"
           />
         </Col>
       </FormGroup>
@@ -208,7 +218,7 @@ const RadialDefaultValues = {
   minorTicks: 2,
   strokeTicks: false,
   highlights: [
-    //{ "from": 0, "to": 5000, "color": "rgba(0,255,0,.15)" },
+    { from: 0, to: 5000, color: "rgba(0,255,0,.15)" },
     { from: 5000, to: 6500, color: "rgba(255,255,0,.15)" },
     { from: 6500, to: 9000, color: "rgba(255,30,0,.25)" },
   ],
@@ -231,6 +241,7 @@ const RadialDefaultValues = {
   animationDuration: "33", //Must be at most 1000/data frequency
   animatedValue: true,
   fontValue: "Led",
+  startAngle: 45,
 };
 
 export const RadialGauge = {
