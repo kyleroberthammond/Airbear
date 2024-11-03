@@ -34,7 +34,10 @@ export const GaugeModalForm = (props) => {
   ); // Set up a form state to handle two way binding
 
   const handleFormChange = (e) => {
-    const formType = e.target.getAttribute("formType");
+    let formType = "string";
+    if (e.target.getAttribute) {
+      formType = e.target.getAttribute("formType");
+    }
     setFormState((prevFormState) => {
       let newFormState = { ...prevFormState };
       if (e.target.type == "checkbox") {

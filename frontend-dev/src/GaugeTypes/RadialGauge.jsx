@@ -13,6 +13,7 @@ import {
 } from "reactstrap";
 import ReactRadialGauge from "../helpers/ReactRadialGuage";
 import { useState } from "preact/hooks";
+import { HexColorPicker } from "react-colorful";
 
 const RadialGaugeForm = (props) => {
   const { formState, handleFormChange } = props;
@@ -45,6 +46,16 @@ const RadialGaugeForm = (props) => {
             Values
           </NavLink>
         </NavItem>
+        <NavItem>
+          <NavLink
+            className={activeTab == "colors" ? "active" : ""}
+            onClick={() => {
+              toggle("colors");
+            }}
+          >
+            Colors
+          </NavLink>
+        </NavItem>
       </Nav>
       <TabContent activeTab={activeTab}>
         <TabPane tabId="text" className="p-3">
@@ -52,6 +63,12 @@ const RadialGaugeForm = (props) => {
         </TabPane>
         <TabPane tabId="values" className="p-3">
           <ValuesTab
+            formState={formState}
+            handleFormChange={handleFormChange}
+          />
+        </TabPane>
+        <TabPane tabId="colors" className="p-3">
+          <StylesTab
             formState={formState}
             handleFormChange={handleFormChange}
           />
@@ -174,6 +191,41 @@ const ValuesTab = (props) => {
             onChange={handleFormChange}
             checked={formState?.strokeTicks}
             type="checkbox"
+          />
+        </Col>
+      </FormGroup>
+    </Fragment>
+  );
+};
+
+const StylesTab = (props) => {
+  const { formState, handleFormChange } = props;
+  return (
+    <Fragment>
+      <FormGroup row>
+        <Col md={3}>
+          <Label for="fontValue">Font Value</Label>
+        </Col>
+        <Col md={9}>
+          <Input
+            name="fontValue"
+            id="fontValue"
+            onChange={handleFormChange}
+            value={formState?.fontValue}
+            type="text"
+          />
+        </Col>
+      </FormGroup>
+      <FormGroup row>
+        <Col md={3}>
+          <Label for="colorPlate">Color Plate</Label>
+        </Col>
+        <Col md={9}>
+          <HexColorPicker
+            color={formState["colorPlate"]}
+            onChange={(value) => {
+              handleFormChange({ target: { name: "colorPlate", value } }); // Fake it as an event
+            }}
           />
         </Col>
       </FormGroup>
