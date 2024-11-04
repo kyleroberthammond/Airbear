@@ -1,0 +1,11 @@
+
+
+.logViewer {
+  left: -100%;
+  width: 1500px;
+  height: 90%;
+}
+
+.logViewer > .modal-body {
+  height: 80vh;
+}

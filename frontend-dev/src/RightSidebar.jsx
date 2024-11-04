@@ -1,12 +1,13 @@
 import { Button } from "reactstrap";
 import PencilIcon from "./Icons/PencilIcon";
 import SettingsIcon from "./Icons/SettingsIcon";
-import { useEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 import MinimizeButton from "./Icons/MinimizeButton";
 import MaximizeButton from "./Icons/MaximizeButton";
+import ChartIcon from "./Icons/ChartIcon";
 
 export const RightSidebar = (props) => {
-  const { toggleEditing } = props;
+  const { toggleEditing, toggleLogModal } = props;
   const [fullscreen, setFullscreen] = useState(false);
   const toggleFullscreen = () => {
     setFullscreen(!fullscreen);
@@ -24,6 +25,9 @@ export const RightSidebar = (props) => {
       </Button>
       <Button className="mt-2" onClick={toggleEditing}>
         <PencilIcon />
+      </Button>
+      <Button className="mt-2" onClick={toggleLogModal}>
+        <ChartIcon />
       </Button>
       <Button
         className="mt-2"

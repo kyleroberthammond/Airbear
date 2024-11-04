@@ -12,11 +12,14 @@ import "../css/style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import isEmpty from "lodash.isempty";
 import GaugeTypes from "./GaugeTypes";
+import LogViewerModal from "./LogViewerModal";
 
 export function App() {
   const toggleEditing = () => setEditing(!editing);
   const [layoutObject, setLayoutObject] = useState({ rows: [] }); // The layout config json, can import a default one.
   const [gaugeModalOpen, setGaugeModalOpen] = useState(false);
+  const [logOpen, setLogOpen] = useState(false);
+  const toggleLogModal = () => setLogOpen(!logOpen);
 
   const [rowIndexAddingOn, setRowIndexAddingOn] = useState(null);
   const [editing, setEditing] = useState(true);
@@ -115,7 +118,10 @@ export function App() {
           )}
         </Col>
         <Col md={1} className="text-end mt-2">
-          <RightSidebar toggleEditing={toggleEditing} />
+          <RightSidebar
+            toggleEditing={toggleEditing}
+            toggleLogModal={toggleLogModal}
+          />
         </Col>
       </Row>
 
@@ -128,6 +134,10 @@ export function App() {
           removeGaugeFromLayout={removeGaugeFromLayout}
           gaugeEditing={gaugeEditing}
         />
+      )}
+
+      {logOpen && (
+        <LogViewerModal isOpen={logOpen} toggleGaugeModal={toggleLogModal} />
       )}
     </Container>
   );
