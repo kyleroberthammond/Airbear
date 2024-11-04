@@ -2,15 +2,15 @@ import { render } from "preact";
 
 import { useEffect, useState } from "preact/hooks";
 import { Button, Col, Container, Row } from "reactstrap";
-import map from "lodash.map";
-import clone from "lodash.clone";
-import sumBy from "lodash.sumby";
+import map from "lodash/map"
+import clone from "lodash/clone";
+import sumBy from "lodash/sumby";
 import GaugeModalForm from "./AddGaugeModal";
 import RightSidebar from "./RightSidebar";
 
 import "../css/style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import isEmpty from "lodash.isempty";
+import isEmpty from "lodash/isempty";
 import GaugeTypes from "./GaugeTypes";
 import LogViewerModal from "./LogViewerModal";
 

@@ -12,8 +12,8 @@ import { useEffect, useState } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
 
 import GaugeTypes from "./GaugeTypes";
-import map from "lodash.map";
-import clone from "lodash.clone";
+import map from "lodash/map";
+import clone from "lodash/clone"
 
 export const GaugeModalForm = (props) => {
   const {
