@@ -13,23 +13,22 @@ import { Fragment } from "preact/jsx-runtime";
 
 import GaugeTypes from "./GaugeTypes";
 import map from "lodash/map";
-import clone from "lodash/clone"
+import clone from "lodash/clone";
 
 export const GaugeModalForm = (props) => {
   const {
     isOpen,
     toggleGaugeModal,
-    addGaugeToLayout,
-    updateGaugeInLayout,
-    removeGaugeFromLayout,
+    addGauge,
+    updateGauge,
+    removeGauge,
     gaugeEditing,
   } = props;
-  const defaultFormState = { containerWidth: 6, offsetWidth: 0 };
 
   const isEditingAGauge = gaugeEditing?.saved;
 
   const [formState, setFormState] = useState(
-    isEditingAGauge ? gaugeEditing : defaultFormState
+    isEditingAGauge ? gaugeEditing : {}
   ); // Set up a form state to handle two way binding
 
   const handleFormChange = (e) => {
@@ -90,32 +89,6 @@ export const GaugeModalForm = (props) => {
             </Input>
           </Col>
         </FormGroup>
-        <FormGroup row>
-          <Col md={4}>Width (1 to 12)</Col>
-          <Col md={4}>
-            <Input
-              type="number"
-              max="12"
-              min="1"
-              onChange={handleFormChange}
-              name="containerWidth"
-              value={formState["containerWidth"]}
-            />
-          </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Col md={4}>Offset from the left (1 to 12)</Col>
-          <Col md={4}>
-            <Input
-              type="number"
-              max="12"
-              min="1"
-              onChange={handleFormChange}
-              name="offsetWidth"
-              value={formState["offsetWidth"]}
-            />
-          </Col>
-        </FormGroup>
         <Row row>
           <Col md={4}>Data Channel</Col>
           <Col md={4}>
@@ -159,9 +132,9 @@ export const GaugeModalForm = (props) => {
                   color="success"
                   onClick={() => {
                     if (isEditingAGauge) {
-                      updateGaugeInLayout(formState);
+                      updateGauge(formState);
                     } else {
-                      addGaugeToLayout(formState);
+                      addGauge(formState);
                     }
                     toggleGaugeModal();
                   }}
@@ -175,7 +148,7 @@ export const GaugeModalForm = (props) => {
                     className="ml-2"
                     color="danger"
                     onClick={() => {
-                      removeGaugeFromLayout(formState);
+                      removeGauge(formState);
                       toggleGaugeModal();
                     }}
                   >

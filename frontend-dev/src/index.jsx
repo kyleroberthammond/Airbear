@@ -1,44 +1,50 @@
 import { render } from "preact";
 
 import { useEffect, useState } from "preact/hooks";
-import { Button, Col, Container, Row } from "reactstrap";
-import map from "lodash/map"
+import { Button, Col, Row } from "reactstrap";
+import map from "lodash/map";
 import clone from "lodash/clone";
 import sumBy from "lodash/sumby";
 import GaugeModalForm from "./AddGaugeModal";
 import RightSidebar from "./RightSidebar";
 
-import "../css/style.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 import isEmpty from "lodash/isempty";
 import GaugeTypes from "./GaugeTypes";
-import LogViewerModal from "./LogViewerModal";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import DndContainer from "./index/DndContainer";
+
+import "../css/style.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+// import LogViewerModal from "./LogViewerModal";
 
 export function App() {
+  const initialDashboardObject = { gauges: [] };
+
   const toggleEditing = () => setEditing(!editing);
-  const [layoutObject, setLayoutObject] = useState({ rows: [] }); // The layout config json, can import a default one.
+  const [layoutObject, setLayoutObject] = useState({
+    dashboards: [initialDashboardObject],
+  }); // The layout config json, can import a default one.
   const [gaugeModalOpen, setGaugeModalOpen] = useState(false);
   const [logOpen, setLogOpen] = useState(false);
   const toggleLogModal = () => setLogOpen(!logOpen);
 
-  const [rowIndexAddingOn, setRowIndexAddingOn] = useState(null);
   const [editing, setEditing] = useState(true);
   const [gaugeEditing, setGaugeEditing] = useState(null);
-  const toggleGaugeModal = () => {
-    setGaugeModalOpen(!gaugeModalOpen);
+  const toggleGaugeModal = (event) => {
+    // Check if the clicked element is the container itself
+    // Ignore if the gauge modal is open
+    if (!event) {
+      setGaugeModalOpen(!gaugeModalOpen);
+    } else if (event?.target === event?.currentTarget && editing) {
+      setGaugeModalOpen(!gaugeModalOpen);
+    }
   };
   useEffect(() => {
     if (!isEmpty(gaugeEditing)) {
       toggleGaugeModal();
     }
   }, [gaugeEditing]);
-
-  // Rows > Gauges
-  // Example object
-  // {rows:[
-  //   {Gauges:[]},
-  //   {Gauges:[]},
-  // ]}
 
   // const [data, setData] = useState({});
   // useEffect(() => {
@@ -49,97 +55,82 @@ export function App() {
   //   // Waiting on my esp32 to arrive to test all this.
   // }, [])
 
-  const { rows } = layoutObject;
-
-  const addRow = () => {
+  const addGauge = (gaugeValues) => {
     let newLayoutObject = clone(layoutObject);
-    newLayoutObject.rows.push({
-      gauges: [],
-    }); // Setup the new row object
 
-    // Update the layout object with the new rows.
-    setLayoutObject(newLayoutObject);
-  };
+    let left = event.clientX;
+    let top = event.clientY;
 
-  const addGaugeToLayout = (gaugeValues) => {
-    let newLayoutObject = clone(layoutObject);
-    newLayoutObject.rows[rowIndexAddingOn].gauges.push({
+    newLayoutObject.dashboards[0].gauges.push({
+      left: left,
+      top: top,
       saved: true,
       ...gaugeValues,
-    }); // Add the gauge to the first row for now
-
-    // // Update the layout object with the new rows.
+    });
     setLayoutObject(newLayoutObject);
   };
 
-  const updateGaugeInLayout = (gaugeValues) => {
+  const moveGauge = (dashboardIndex, gaugeIndex, left, top) => {
     let newLayoutObject = clone(layoutObject);
-    newLayoutObject.rows[gaugeValues.rowIndex].gauges[gaugeValues.gaugeIndex] =
-      gaugeValues; // Add the gauge to the first row
-
-    // // Update the layout object with the new rows.
+    newLayoutObject.dashboards[dashboardIndex].gauges[gaugeIndex].left = left;
+    newLayoutObject.dashboards[dashboardIndex].gauges[gaugeIndex].top = top;
     setLayoutObject(newLayoutObject);
   };
 
-  const removeGaugeFromLayout = (gaugeValues) => {
-    let newLayoutObject = clone(layoutObject);
-    newLayoutObject.rows[gaugeValues.rowIndex].gauges.splice(
-      gaugeValues.gaugeIndex,
-      1
-    ); // Add the gauge to the first row
+  // console.log(layoutObject);
 
-    // // Update the layout object with the new rows.
-    setLayoutObject(newLayoutObject);
-  };
+  // const updateGaugeInLayout = (gaugeValues) => {
+  //   let newLayoutObject = clone(layoutObject);
+  //   newLayoutObject.rows[gaugeValues.rowIndex].gauges[gaugeValues.gaugeIndex] =
+  //     gaugeValues; // Add the gauge to the first row
+
+  //   // // Update the layout object with the new rows.
+  //   setLayoutObject(newLayoutObject);
+  // };
+
+  // const removeGaugeFromLayout = (gaugeValues) => {
+  //   let newLayoutObject = clone(layoutObject);
+  //   newLayoutObject.rows[gaugeValues.rowIndex].gauges.splice(
+  //     gaugeValues.gaugeIndex,
+  //     1
+  //   ); // Add the gauge to the first row
+
+  //   // // Update the layout object with the new rows.
+  //   setLayoutObject(newLayoutObject);
+  // };
 
   return (
-    <Container fluid>
-      <Row>
-        <Col md={11}>
-          {map(rows, (row, rowIndex) => {
-            return (
-              <RowOfGauges
-                row={row}
-                key={rowIndex}
-                rowIndex={rowIndex}
-                toggleGaugeModal={toggleGaugeModal}
-                setGaugeEditing={setGaugeEditing}
-                editing={editing}
-                setRowIndexAddingOn={setRowIndexAddingOn}
-              />
-            );
-          })}
-          {editing && (
-            <Row className="mt-2">
-              <Col>
-                <Button onClick={addRow}>Add Row</Button>
-              </Col>
-            </Row>
-          )}
-        </Col>
-        <Col md={1} className="text-end mt-2">
-          <RightSidebar
-            toggleEditing={toggleEditing}
-            toggleLogModal={toggleLogModal}
-          />
-        </Col>
-      </Row>
-
+    <DndProvider backend={HTML5Backend}>
+      {map(layoutObject.dashboards, (dashboard, dashboardIndex) => {
+        return (
+          <DndContainer
+            toggleGaugeModal={toggleGaugeModal}
+            editing={editing}
+            moveGauge={moveGauge}
+            gauges={dashboard?.gauges}
+          >
+            <RightSidebar
+              toggleEditing={toggleEditing}
+              toggleLogModal={toggleLogModal}
+              dashboardIndex={dashboardIndex}
+            />
+          </DndContainer>
+        );
+      })}
       {gaugeModalOpen && (
         <GaugeModalForm
           isOpen={gaugeModalOpen}
           toggleGaugeModal={toggleGaugeModal}
-          addGaugeToLayout={addGaugeToLayout}
-          updateGaugeInLayout={updateGaugeInLayout}
-          removeGaugeFromLayout={removeGaugeFromLayout}
+          addGauge={addGauge}
+          // updateGaugeInLayout={updateGaugeInLayout}
+          // removeGaugeFromLayout={removeGaugeFromLayout}
           gaugeEditing={gaugeEditing}
         />
       )}
-
-      {logOpen && (
-        <LogViewerModal isOpen={logOpen} toggleGaugeModal={toggleLogModal} />
-      )}
-    </Container>
+      {/* {logOpen && (
+  <LogViewerModal isOpen={logOpen} toggleGaugeModal={toggleLogModal} />
+)} */}
+    </DndProvider>
   );
 }
 

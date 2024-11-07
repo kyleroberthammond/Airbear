@@ -248,7 +248,11 @@ const StylesTab = (props) => {
 const RadialGaugeRender = ({ editing, gaugeValues, onGaugeClick }) => {
   return (
     <ReactRadialGauge
-      style={{ cursor: editing ? "pointer" : "" }}
+      style={{
+        cursor: editing ? "pointer" : "",
+        left: gaugeValues.left,
+        top: gaugeValues.top,
+      }}
       onClick={() => {
         if (editing) {
           onGaugeClick();
