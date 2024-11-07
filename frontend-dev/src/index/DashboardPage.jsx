@@ -1,11 +1,11 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { ItemTypes } from "./ItemTypes.js";
 import GaugeTypes from "../GaugeTypes/index.jsx";
-import each from "lodash/each.js";
 import { find, map } from "lodash";
+import { Box } from "./Box.jsx";
 
-const DndContainer = (props) => {
+const DashboardPage = (props) => {
   const {
     children,
     toggleGaugeModal,
@@ -39,10 +39,10 @@ const DndContainer = (props) => {
       accept: ItemTypes.GAUGE,
       drop(item, monitor) {
         const delta = monitor.getDifferenceFromInitialOffset();
-        const left = Math.round(item.left + delta.x);
-        const top = Math.round(item.top + delta.y);
-        // moveGauge(dashboardIndex, left, top);
-        console.log(item);
+        const gaugeIndex = item.gaugeIndex;
+        const newLeft = Math.round(item.left + delta.x);
+        const newTop = Math.round(item.top + delta.y);
+        moveGauge(dashboardIndex, gaugeIndex, newLeft, newTop);
         return undefined;
       },
     }),
@@ -51,23 +51,23 @@ const DndContainer = (props) => {
   return (
     <div ref={drop} style={styles} onClick={toggleGaugeModal}>
       <div style={{ width: "95%", float: "left" }}>
-        {map(gauges, (gauge, gaugeIndex) => {
+        {map(gauges, (gaugeValues, gaugeIndex) => {
           const findGaugeType = find(
             GaugeTypes,
-            (gt) => gt.value == gauge.type
+            (gt) => gt.value == gaugeValues.type
           );
-
-          console.log(gauge);
 
           if (findGaugeType) {
             return (
-              <DraggableItem>
+              <DraggableItem
+                hideSourceOnDrag
+                gaugeValues={gaugeValues}
+                gaugeIndex={gaugeIndex}
+              >
                 <findGaugeType.renderGauge
                   key={gaugeIndex}
                   editing={editing}
-                  gaugeValues={gauge}
-                  left={gauge.left}
-                  top={gauge.top}
+                  gaugeValues={gaugeValues}
                 />
               </DraggableItem>
             );
@@ -83,7 +83,7 @@ const DndContainer = (props) => {
   );
 };
 
-export default DndContainer;
+export default DashboardPage;
 
 const style = {
   position: "absolute",
@@ -92,28 +92,32 @@ const style = {
   padding: "0.5rem 1rem",
   cursor: "move",
 };
-export const DraggableItem = ({
-  id,
-  left,
-  top,
-  hideSourceOnDrag,
-  children,
-}) => {
+
+const DraggableItem = (props) => {
+  const { hideSourceOnDrag, children, gaugeValues, gaugeIndex } = props;
+  const { left, top } = gaugeValues;
+
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: ItemTypes.GAUGE,
-      item: { id, left, top },
+      item: { left, top, gaugeIndex },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [id, left, top]
+    [left, top]
   );
+
   if (isDragging && hideSourceOnDrag) {
     return <div ref={drag} />;
   }
   return (
-    <div className="box" ref={drag} style={{ ...style, left, top }}>
+    <div
+      className="box"
+      ref={drag}
+      style={{ ...style, left, top }}
+      data-testid="box"
+    >
       {children}
     </div>
   );

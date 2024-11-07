@@ -12,10 +12,10 @@ import isEmpty from "lodash/isempty";
 import GaugeTypes from "./GaugeTypes";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import DndContainer from "./index/DndContainer";
 
 import "../css/style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import DashboardPage from "./index/DashboardPage";
 // import LogViewerModal from "./LogViewerModal";
 
 export function App() {
@@ -103,18 +103,19 @@ export function App() {
     <DndProvider backend={HTML5Backend}>
       {map(layoutObject.dashboards, (dashboard, dashboardIndex) => {
         return (
-          <DndContainer
+          <DashboardPage
             toggleGaugeModal={toggleGaugeModal}
             editing={editing}
             moveGauge={moveGauge}
             gauges={dashboard?.gauges}
+            dashboardIndex={dashboardIndex}
           >
             <RightSidebar
               toggleEditing={toggleEditing}
               toggleLogModal={toggleLogModal}
               dashboardIndex={dashboardIndex}
             />
-          </DndContainer>
+          </DashboardPage>
         );
       })}
       {gaugeModalOpen && (

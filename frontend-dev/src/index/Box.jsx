@@ -10,7 +10,7 @@ const style = {
 export const Box = ({ id, left, top, hideSourceOnDrag, children }) => {
   const [{ isDragging }, drag] = useDrag(
     () => ({
-      type: ItemTypes.BOX,
+      type: ItemTypes.GAUGE,
       item: { id, left, top },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
