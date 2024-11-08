@@ -29,6 +29,8 @@ export function App() {
   const [logOpen, setLogOpen] = useState(false);
   const toggleLogModal = () => setLogOpen(!logOpen);
 
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
   const [editing, setEditing] = useState(true);
   const [gaugeEditing, setGaugeEditing] = useState(null);
   const toggleGaugeModal = (event) => {
@@ -39,6 +41,9 @@ export function App() {
     } else if (event?.target === event?.currentTarget && editing) {
       setGaugeModalOpen(!gaugeModalOpen);
     }
+    const left = event?.clientX;
+    const top = event?.clientY;
+    setMousePosition({ left: left, top: top });
   };
   useEffect(() => {
     if (!isEmpty(gaugeEditing)) {
@@ -58,13 +63,11 @@ export function App() {
   const addGauge = (gaugeValues) => {
     let newLayoutObject = clone(layoutObject);
 
-    let left = event.clientX;
-    let top = event.clientY;
-
     newLayoutObject.dashboards[0].gauges.push({
-      left: left,
-      top: top,
+      left: mousePosition.left,
+      top: mousePosition.top,
       saved: true,
+      dashboardIndex: 0,
       ...gaugeValues,
     });
     setLayoutObject(newLayoutObject);
@@ -77,16 +80,12 @@ export function App() {
     setLayoutObject(newLayoutObject);
   };
 
-  // console.log(layoutObject);
-
-  // const updateGaugeInLayout = (gaugeValues) => {
-  //   let newLayoutObject = clone(layoutObject);
-  //   newLayoutObject.rows[gaugeValues.rowIndex].gauges[gaugeValues.gaugeIndex] =
-  //     gaugeValues; // Add the gauge to the first row
-
-  //   // // Update the layout object with the new rows.
-  //   setLayoutObject(newLayoutObject);
-  // };
+  const updateGauge = (gaugeValues) => {
+    const { dashboardIndex, gaugeIndex } = gaugeEditing;
+    let newLayoutObject = clone(layoutObject);
+    newLayoutObject.dashboards[dashboardIndex].gauges[gaugeIndex] = gaugeValues;
+    setLayoutObject(newLayoutObject);
+  };
 
   // const removeGaugeFromLayout = (gaugeValues) => {
   //   let newLayoutObject = clone(layoutObject);
@@ -109,6 +108,8 @@ export function App() {
             moveGauge={moveGauge}
             gauges={dashboard?.gauges}
             dashboardIndex={dashboardIndex}
+            setGaugeEditing={setGaugeEditing}
+            gaugeEditing={gaugeEditing}
           >
             <RightSidebar
               toggleEditing={toggleEditing}
@@ -123,70 +124,16 @@ export function App() {
           isOpen={gaugeModalOpen}
           toggleGaugeModal={toggleGaugeModal}
           addGauge={addGauge}
-          // updateGaugeInLayout={updateGaugeInLayout}
-          // removeGaugeFromLayout={removeGaugeFromLayout}
+          updateGauge={updateGauge}
+          // removeGauge={removeGauge}
           gaugeEditing={gaugeEditing}
         />
       )}
       {/* {logOpen && (
-  <LogViewerModal isOpen={logOpen} toggleGaugeModal={toggleLogModal} />
-)} */}
+        <LogViewerModal isOpen={logOpen} toggleGaugeModal={toggleLogModal} />
+      )} */}
     </DndProvider>
   );
 }
-
-const RowOfGauges = (props) => {
-  const {
-    row,
-    rowIndex,
-    toggleGaugeModal,
-    editing,
-    setGaugeEditing,
-    setRowIndexAddingOn,
-  } = props;
-  const { gauges } = row;
-
-  const totalUsedWidth = sumBy(
-    gauges,
-    (g) => parseInt(g.containerWidth) + parseInt(g.offsetWidth)
-  );
-
-  return (
-    <Row className="mt-2">
-      {map(gauges, (gauge, gaugeIndex) => {
-        const findGaugeType = GaugeTypes.find((gt) => gt.value === gauge?.type);
-        if (findGaugeType) {
-          return (
-            <Col
-              key={gaugeIndex}
-              md={{ size: gauge?.containerWidth, offset: gauge?.offsetWidth }}
-            >
-              <findGaugeType.renderGauge
-                editing={editing}
-                gaugeValues={gauge}
-                onGaugeClick={() => {
-                  setGaugeEditing({ ...gauge, rowIndex, gaugeIndex });
-                }}
-              />
-            </Col>
-          );
-        }
-      })}
-      {totalUsedWidth < 12 && editing && (
-        <Col>
-          <Button
-            onClick={() => {
-              setGaugeEditing(null);
-              toggleGaugeModal();
-              setRowIndexAddingOn(rowIndex);
-            }}
-          >
-            Add Gauge
-          </Button>
-        </Col>
-      )}
-    </Row>
-  );
-};
 
 render(<App />, document.getElementById("app"));

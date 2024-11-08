@@ -3,7 +3,6 @@ import { useDrag, useDrop } from "react-dnd";
 import { ItemTypes } from "./ItemTypes.js";
 import GaugeTypes from "../GaugeTypes/index.jsx";
 import { find, map } from "lodash";
-import { Box } from "./Box.jsx";
 
 const DashboardPage = (props) => {
   const {
@@ -13,6 +12,8 @@ const DashboardPage = (props) => {
     dashboardIndex,
     moveGauge,
     gauges,
+    setGaugeEditing,
+    gaugeEditing
   } = props;
 
   const styles = useMemo(() => {
@@ -68,6 +69,16 @@ const DashboardPage = (props) => {
                   key={gaugeIndex}
                   editing={editing}
                   gaugeValues={gaugeValues}
+                  onGaugeClick={() => {
+                    console.log("click");
+                    setGaugeEditing({
+                      gaugeValues,
+                      gaugeIndex,
+                      dashboardIndex,
+                    });
+                    console.log(gaugeEditing)
+                    toggleGaugeModal(gaugeIndex);
+                  }}
                 />
               </DraggableItem>
             );
@@ -112,12 +123,7 @@ const DraggableItem = (props) => {
     return <div ref={drag} />;
   }
   return (
-    <div
-      className="box"
-      ref={drag}
-      style={{ ...style, left, top }}
-      data-testid="box"
-    >
+    <div ref={drag} style={{ ...style, left, top }}>
       {children}
     </div>
   );

@@ -25,10 +25,10 @@ export const GaugeModalForm = (props) => {
     gaugeEditing,
   } = props;
 
-  const isEditingAGauge = gaugeEditing?.saved;
+  const isEditingAGauge = gaugeEditing?.gaugeValues?.saved;
 
   const [formState, setFormState] = useState(
-    isEditingAGauge ? gaugeEditing : {}
+    isEditingAGauge ? gaugeEditing?.gaugeValues : {}
   ); // Set up a form state to handle two way binding
 
   const handleFormChange = (e) => {
